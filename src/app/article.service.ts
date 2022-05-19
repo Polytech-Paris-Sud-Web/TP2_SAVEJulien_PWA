@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import { Observable } from 'rxjs';
+import {map, Observable, of} from 'rxjs';
 import { Article} from './models/article';
+import {environment} from "../environments/environment";
 
 
 @Injectable({
@@ -9,11 +10,13 @@ import { Article} from './models/article';
 })
 export class ArticleService {
 
+  private pArticles: Article[] | undefined;
+
   constructor(private http : HttpClient) {
   }
 
   public getArticles(): Observable<Article[]> {
-    return this.http.get<Article[]>("http://localhost:3000/articles");
+    return this.pArticles ? of(this.pArticles) : this.http.get<Article[]>(`${environment.db}/articles`);
   }
 
   public deleteArticle(article: Article) {
@@ -29,15 +32,28 @@ export class ArticleService {
   }
 
   public getArticle(id: number): Observable<Article> {
-      return this.http.get<Article>(`http://localhost:3000/articles/${id}`);
+    return this.getArticles().pipe(
+      map(articles => articles.find(article => article.id === id) as Article)
+    );
     }
 
   public search(mot : string): Observable<Article[]> {
-    return this.http.get<Article[]>(`http://localhost:3000/articles?q=${mot}`);
+    return this.getArticles().pipe(map(articles => articles.filter(article => article.title.includes(mot) || article.content.includes(mot) || article.author.includes(mot))));
   }
 
   public lastTenArticles(): Observable<Article[]> {
-    return this.http.get<Article[]>(`http://localhost:3000/articles?_sort=id&_order=desc&_limit=10`);
+    return this.pArticles ? of(this.pArticles) : this.http.get<Article[]>(`${environment.db}/articles?_sort=id&_order=desc&_limit=10`);
+  }
+
+  public preloadArticles(): Observable<Article[]> {
+    if (!this.pArticles) {
+      return this.http.get<Article[]>(`${environment.db}/article`).pipe(
+        map(article => {
+          this.pArticles = article;
+          return article;
+        }));
+    }
+    return of(this.pArticles);
   }
 
 }

@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { ArticleService } from './article.service';
+import { AuthorService } from './author.service';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +9,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'simple-app';
+
+  constructor(private articleService: ArticleService, private authorService: AuthorService) {
+    authorService.preloadAuthors().subscribe();
+    articleService.preloadArticles().subscribe();
+  }
 }
