@@ -47,7 +47,7 @@ export class ArticleService {
 
   public preloadArticles(): Observable<Article[]> {
     if (!this.pArticles) {
-      return this.http.get<Article[]>(`${environment.db}/article`).pipe(
+      return this.http.get<Article[]>(`${environment.db}/articles`).pipe(
         map(article => {
           this.pArticles = article;
           return article;
