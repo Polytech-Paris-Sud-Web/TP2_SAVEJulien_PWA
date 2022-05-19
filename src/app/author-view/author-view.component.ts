@@ -22,7 +22,7 @@ export class AuthorViewComponent implements OnInit {
   constructor(private route: ActivatedRoute, private router: Router, private authorService: AuthorService) {
     const name = (this.route.snapshot.paramMap.get('name') || '');
     this.authorService.getAuthor(name).subscribe(value => {
-      this.author = value[0];
+      this.author = value;
     });
   }
 
