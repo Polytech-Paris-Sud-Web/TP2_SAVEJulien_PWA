@@ -42,7 +42,7 @@ export class ArticleService {
   }
 
   public lastTenArticles(): Observable<Article[]> {
-    return this.pArticles ? of(this.pArticles) : this.http.get<Article[]>(`${environment.db}/articles?_sort=id&_order=desc&_limit=10`);
+    return this.getArticles().pipe(map(articles => articles.slice(0, 10)));
   }
 
   public preloadArticles(): Observable<Article[]> {
